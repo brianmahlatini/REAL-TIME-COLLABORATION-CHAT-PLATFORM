@@ -1,0 +1,24 @@
+{
+  "name": "real-time-collaboration-chat-platform",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Slack-style real-time collaboration chat platform with React, Express, Socket.io, MongoDB, Redis, Clerk, S3 uploads, queues, and Docker.",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace backend\" \"npm run dev --workspace frontend\"",
+    "build": "npm run build --workspace backend && npm run build --workspace frontend",
+    "lint": "npm run lint --workspace backend && npm run lint --workspace frontend",
+    "typecheck": "npm run typecheck --workspace backend && npm run typecheck --workspace frontend",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down -v"
+  },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  }
+}
