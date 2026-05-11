@@ -11,10 +11,16 @@
   box-sizing: border-box;
 }
 
+html,
+#root {
+  height: 100%;
+}
+
 body {
   margin: 0;
   min-width: 320px;
-  min-height: 100vh;
+  height: 100%;
+  overflow: hidden;
 }
 
 button,
@@ -89,7 +95,7 @@ button {
 }
 
 .workspace {
-  height: 100vh;
+  height: 100dvh;
   display: grid;
   grid-template-columns: 310px minmax(0, 1fr);
   overflow: hidden;
@@ -284,8 +290,11 @@ button {
 
 .chat-panel {
   min-width: 0;
+  min-height: 0;
+  height: 100%;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr) auto;
+  overflow: hidden;
   background: #f7f9fa;
 }
 
@@ -390,7 +399,9 @@ button {
 
 .messages {
   min-height: 0;
-  overflow-y: auto;
+  overflow-y: scroll;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   padding: 22px 24px;
   display: flex;
   flex-direction: column;
@@ -477,6 +488,7 @@ button {
 }
 
 .composer {
+  min-height: 78px;
   border-top: 1px solid #dde5e9;
   padding: 12px 16px 16px;
   background: #eef3f5;
