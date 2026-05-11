@@ -16,11 +16,11 @@ This project is built as a senior-level portfolio/MVP system: the frontend and b
 
 ### Channel Workspace
 
-![Channel workspace](docs/assets/screenshots/team-chat-channel-workspace.png)
+![Channel workspace](docs/assets/screenshots/team-chat-channel-workspace-new.png)
 
 ### Direct Message Conversation
 
-![Direct message conversation](docs/assets/screenshots/team-chat-direct-message.png)
+![Direct message conversation](docs/assets/screenshots/team-chat-direct-message-new.png)
 
 ## What This App Does
 
