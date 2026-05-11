@@ -9,6 +9,12 @@ usersRouter.get("/me", async (req, res) => {
 });
 
 usersRouter.get("/users", async (_req, res) => {
-  const users = await User.find().sort({ status: 1, name: 1 }).limit(100).lean();
+  const users = await User.find({
+    externalId: { $ne: "demo-user" },
+    name: { $nin: ["Demo User", "Team Member"] }
+  })
+    .sort({ status: 1, name: 1 })
+    .limit(100)
+    .lean();
   res.json({ users });
 });

@@ -9,6 +9,7 @@ import {
   Plus,
   Search,
   Send,
+  Trash2,
   Upload,
   Users
 } from "lucide-react";
@@ -75,6 +76,16 @@ export default function App({ auth, userMenu }: Props) {
     return users.filter((user) => activeChannel.memberIds.includes(user.externalId));
   }, [activeChannel, users]);
 
+  const people = useMemo(() => users.filter((user) => user.externalId !== auth.profile.id), [auth.profile.id, users]);
+
+  function channelLabel(channel?: Channel) {
+    if (!channel) return "Create a channel";
+    if (channel.type !== "dm") return channel.name;
+
+    const otherMember = users.find((user) => channel.memberIds.includes(user.externalId) && user.externalId !== auth.profile.id);
+    return otherMember?.name || "Direct message";
+  }
+
   async function createChannel() {
     if (!channelName.trim()) return;
     const response = await api.createChannel(auth, { name: channelName.trim() });
@@ -89,6 +100,25 @@ export default function App({ auth, userMenu }: Props) {
       current.some((channel) => channel._id === response.channel._id) ? current : [response.channel, ...current]
     );
     setActiveChannelId(response.channel._id);
+  }
+
+  async function deleteActiveChannel() {
+    if (!activeChannel) return;
+    const confirmed = window.confirm(`Delete ${channelLabel(activeChannel)} and all messages in it?`);
+    if (!confirmed) return;
+
+    try {
+      await api.deleteChannel(auth, activeChannel._id);
+      setChannels((current) => {
+        const next = current.filter((channel) => channel._id !== activeChannel._id);
+        setActiveChannelId(next[0]?._id);
+        return next;
+      });
+      setMessages([]);
+      setError(null);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Unable to delete chat");
+    }
   }
 
   function sendMessage() {
@@ -155,6 +185,14 @@ export default function App({ auth, userMenu }: Props) {
           </div>
         </div>
 
+        <div className="current-user">
+          <div className="avatar">{auth.profile.name.slice(0, 1).toUpperCase()}</div>
+          <div>
+            <span>Signed in as</span>
+            <strong>{auth.profile.name}</strong>
+          </div>
+        </div>
+
         <label className="search">
           <Search size={16} />
           <input placeholder="Search conversations" />
@@ -180,7 +218,7 @@ export default function App({ auth, userMenu }: Props) {
                   onClick={() => setActiveChannelId(channel._id)}
                 >
                   {channel.isPrivate ? <Lock size={16} /> : <Hash size={16} />}
-                  <span>{channel.name}</span>
+                  <span>{channelLabel(channel)}</span>
                 </button>
               ))}
           </div>
@@ -192,7 +230,8 @@ export default function App({ auth, userMenu }: Props) {
             <Users size={16} />
           </div>
           <div className="conversation-list people">
-            {users.map((user) => (
+            {people.length === 0 && <p className="empty-list">No teammates signed in yet.</p>}
+            {people.map((user) => (
               <button key={user.externalId} onClick={() => createDm(user)}>
                 <Circle
                   size={10}
@@ -212,10 +251,13 @@ export default function App({ auth, userMenu }: Props) {
             <p>{activeChannel?.type === "dm" ? "Direct message" : "Channel"}</p>
             <h1>
               {activeChannel?.type === "dm" ? <MessageSquare size={22} /> : <Hash size={22} />}
-              {activeChannel?.name || "Create a channel"}
+              {channelLabel(activeChannel)}
             </h1>
           </div>
           <div className="header-actions">
+            <button title="Delete selected chat" disabled={!activeChannel} onClick={deleteActiveChannel}>
+              <Trash2 size={18} />
+            </button>
             <button title="Enable notifications" className={notificationsEnabled ? "enabled" : ""} onClick={enableNotifications}>
               <Bell size={18} />
             </button>

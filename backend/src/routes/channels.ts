@@ -2,6 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import {
   createChannel,
+  deleteChannel,
   createMessage,
   getOrCreateDirectMessage,
   listChannels,
@@ -59,6 +60,11 @@ channelsRouter.get("/channels/:channelId/messages", async (req, res) => {
     typeof req.query.before === "string" ? req.query.before : undefined
   );
   res.json({ messages: messages.reverse() });
+});
+
+channelsRouter.delete("/channels/:channelId", async (req, res) => {
+  await deleteChannel(req.params.channelId, (req as unknown as AuthedRequest).user.id);
+  res.status(204).send();
 });
 
 channelsRouter.post("/channels/:channelId/messages", async (req, res) => {

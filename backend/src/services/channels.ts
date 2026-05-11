@@ -59,6 +59,12 @@ export async function listMessages(channelId: string, userId: string, before?: s
   return Message.find(query).sort({ createdAt: -1 }).limit(50).lean();
 }
 
+export async function deleteChannel(channelId: string, userId: string) {
+  await ensureMember(channelId, userId);
+  await Message.deleteMany({ channelId });
+  await Channel.deleteOne({ _id: channelId });
+}
+
 export async function createMessage(input: {
   channelId: string;
   sender: AuthUser;

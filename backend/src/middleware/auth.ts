@@ -25,6 +25,7 @@ async function clerkUser(req: AuthedRequest): Promise<AuthUser> {
     throw new Error("Clerk issuer and JWKS URL are required in clerk auth mode");
   }
 
+  const displayName = req.header("x-user-name")?.trim();
   jwks ??= createRemoteJWKSet(new URL(env.CLERK_JWKS_URL));
   const { payload } = await jwtVerify(token, jwks, {
     issuer: env.CLERK_JWT_ISSUER
@@ -34,11 +35,12 @@ async function clerkUser(req: AuthedRequest): Promise<AuthUser> {
     id: String(payload.sub),
     email: typeof payload.email === "string" ? payload.email : undefined,
     name:
-      typeof payload.name === "string"
+      displayName ||
+      (typeof payload.name === "string"
         ? payload.name
         : typeof payload.username === "string"
           ? payload.username
-          : "Team Member",
+          : "Team Member"),
     imageUrl: typeof payload.picture === "string" ? payload.picture : undefined
   };
 }

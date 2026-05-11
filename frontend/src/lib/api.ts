@@ -31,6 +31,10 @@ async function request<T>(auth: ApiAuth, path: string, init: RequestInit = {}): 
     throw new Error(error.message || "Request failed");
   }
 
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
   return response.json();
 }
 
@@ -58,6 +62,11 @@ export const api = {
   },
   async messages(auth: ApiAuth, channelId: string) {
     return request<{ messages: Message[] }>(auth, `/channels/${channelId}/messages`);
+  },
+  async deleteChannel(auth: ApiAuth, channelId: string) {
+    await request<void>(auth, `/channels/${channelId}`, {
+      method: "DELETE"
+    });
   },
   async upload(auth: ApiAuth, file: File) {
     const token = await auth.getToken();
